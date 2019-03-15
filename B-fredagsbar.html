@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        #container {
+            width: 50%;
+            width: 400px;
+            margin: 0 auto;
+        }
+        
+        #barchart {
+            border: 10px solid #333;
+        }
+        
+        .lines {
+            stroke: #333;
+            stroke-width: 0.5;
+        }
+        
+        .bar {
+            stroke: #ca1;
+            stroke-width: 30;
+        }
+        
+        .bgr text {
+            font-size: 18px;
+            font-family: Courier;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <svg id="barchart" viewbox="0 0 300 200">
+            <g class="bgr">
+                <line class="lines" x1="20" y1="190" x2="20" y2="20" />
+                <line class="lines" x1="20" y1="190" x2="290" y2="190" />
+                <line class="lines" x1="20" y1="100" x2="290" y2="100" />
+                <line class="lines" x1="20" y1="20" x2="290" y2="20" />
+                <text x="5" y="190">0</text>
+                <text x="5" y="100">50</text>
+                <text x="5" y="20">100</text>
+                <text id="infotext" x="150" y="100">value</text>
+
+            </g>
+            <g class="bars">
+                <line class="bar" x1="40" y1="190" x2="40" y2="40" />
+                <line class="bar" x1="80" y1="190" x2="80" y2="80" />
+                <line class="bar" x1="120" y1="190" x2="120" y2="30" />
+            </g>
+
+        </svg>
+    </div>
+    <script>
+        let values = [];
+
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            console.log("start");
+            hentJson();
+        }
+        async function hentJson() {
+            let Jdata = await fetch("b-fredagsbar-json.json");
+            console.log(Jdata);
+            values = await Jdata.json();
+            visValues();
+        }
+
+        function visValues() {
+            document.querySelectorAll(".bars .bar").forEach((sojle, i) => {
+                /***** her lå fejlen. den rigtige: values[i].value, der refererer til objektets værdi (et tal)
+                og ikke  values[i] alene fordi det refererer til hele json-objektet og derfor ikke noget tal...
+                ***/
+                let fraTop = 200 - (200 / 100 * values[i].value) + 20;
+                sojle.setAttribute("y2", fraTop);
+                sojle.setAttribute("data-value", values[i].value);
+            });
+        }
+
+        document.querySelector(".bars").addEventListener("mouseover", e => {
+            //console.log(e);
+            document.querySelector("#infotext").innerHTML = e.target.getAttribute("data-value") + "%";
+            console.log(e.target.getAttribute("data-value"));
+        });
+
+    </script>
+</body>
+
+</html>
